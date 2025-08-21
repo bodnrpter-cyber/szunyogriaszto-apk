@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Szúnyogriasztó</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #e8f5e9; }
+    button {
+      padding: 15px 25px; margin: 20px; font-size: 18px; border-radius: 12px;
+      border: none; background: #4caf50; color: white; cursor: pointer;
+    }
+    button:disabled { background: gray; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <h1>🦟 Szúnyogriasztó</h1>
+  <p>Kattints a gombra a magas frekvenciájú hang elindításához!</p>
+  <button id="toggle">Indítás</button>
+
+  <script>
+    let ctx, osc, running = false;
+
+    document.getElementById("toggle").onclick = () => {
+      if (!running) {
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        osc = ctx.createOscillator();
+        osc.type = "square";
+        osc.frequency.setValueAtTime(17500, ctx.currentTime); // 17.5 kHz
+        osc.connect(ctx.destination);
+        osc.start();
+        document.getElementById("toggle").textContent = "Leállítás";
+        running = true;
+      } else {
+        osc.stop();
+        ctx.close();
+        document.getElementById("toggle").textContent = "Indítás";
+        running = false;
+      }
+    };
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register("sw.js");
+    }
+  </script>
+</body>
+</html>
